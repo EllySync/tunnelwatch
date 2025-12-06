@@ -1,0 +1,124 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tunnelwatch-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./database/seed-tunnels.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tunnelwatch-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  php:
+    build: ./php
+    container_name: tunnelwatch-php
+    volumes:
+      - ./php:/var/www/html
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+
+  nginx:
+    build: ./nginx
+    container_name: tunnelwatch-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./php/public:/var/www/html/public:ro
+    depends_on:
+      - php
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+
+  worker:
+    build: ./workers
+    container_name: tunnelwatch-worker
+    command: celery -A celery_app worker --loglevel=info
+    volumes:
+      - ./workers:/app
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+      - SIGNAL_API_URL=${SIGNAL_API_URL}
+      - SIGNAL_NUMBER=${SIGNAL_NUMBER}
+      - VEGVESEN_API_URL=${VEGVESEN_API_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+
+  beat:
+    build: ./workers
+    container_name: tunnelwatch-beat
+    command: celery -A celery_app beat --loglevel=info
+    volumes:
+      - ./workers:/app
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+
+  signal-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: tunnelwatch-signal
+    environment:
+      - MODE=native
+    volumes:
+      - signal_data:/home/.local/share/signal-cli
+    networks:
+      - tunnelwatch
+    restart: unless-stopped
+
+networks:
+  tunnelwatch:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  signal_data:

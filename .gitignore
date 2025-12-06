@@ -1,0 +1,39 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+vendor/
+node_modules/
+__pycache__/
+*.pyc
+
+# Docker volumes (if local)
+postgres_data/
+redis_data/
+signal_data/
+
+# Logs
+*.log
+logs/
+
+# Backups
+*.sql
+*.sql.gz
+backups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.temp
+.cache/

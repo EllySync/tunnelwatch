@@ -1,0 +1,81 @@
+/* TunnelWatch Norway - Styles */
+
+/* Status bar colors */
+.status-open-bar { background-color: #10b981; }
+.status-closed-bar { background-color: #ef4444; }
+.status-restricted-bar { background-color: #f59e0b; }
+.status-unknown-bar { background-color: #6b7280; }
+
+/* Badge styles */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.badge-green { 
+    background-color: #d1fae5; 
+    color: #065f46; 
+}
+
+.badge-red { 
+    background-color: #fee2e2; 
+    color: #991b1b; 
+}
+
+.badge-yellow { 
+    background-color: #fef3c7; 
+    color: #92400e; 
+}
+
+.badge-gray { 
+    background-color: #f3f4f6; 
+    color: #374151; 
+}
+
+/* Card hover effect */
+.tunnel-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.tunnel-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Pulse animation for status changes */
+@keyframes pulse-status {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.status-changed {
+    animation: pulse-status 1s ease-in-out 3;
+}
+
+/* Loading spinner */
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "name": "tunnelwatch/norway",
+    "description": "Real-time Norwegian tunnel status monitoring",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "TunnelWatch\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
