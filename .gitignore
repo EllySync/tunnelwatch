@@ -19,8 +19,8 @@ signal_data/
 logs/
 
 # Backups
-*.sql
-*.sql.gz
+backups/*.sql
+backups/*.sql.gz
 backups/
 
 # IDE
