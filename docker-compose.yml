@@ -90,7 +90,7 @@ services:
   beat:
     build: ./workers
     container_name: tunnelwatch-beat
-    command: celery -A celery_app beat --loglevel=info
+    command: celery -A celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule
     volumes:
       - ./workers:/app
     environment:
