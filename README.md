@@ -55,17 +55,33 @@ make shell-db     # Open database shell
 make check-tunnels # Manually trigger tunnel check
 ```
 
-## Signal Setup
+## Signal Setup (External Service)
+
+TunnelWatch uses an external Signal service for notifications. This allows multiple apps to share one Signal registration.
+
+### 1. Set up Signal Service (one-time)
 
 ```bash
-# 1. Register your Signal number
-./scripts/register-signal.sh
+# Clone and start the signal service
+cd ~/signal-service
+docker compose up -d
+./register.sh +47XXXXXXXX
+```
 
-# 2. Add a subscription
+See: [signal-service](https://github.com/EllySync/signal-service)
+
+### 2. Configure TunnelWatch
+
+In your `.env`:
+```
+SIGNAL_NUMBER=+47XXXXXXXX
+SIGNAL_API_URL=http://localhost:8080
+```
+
+### 3. Add subscription
+
+```bash
 ./scripts/add-subscription.sh +4712345678 mastrafjord
-
-# 3. Test notification
-make test-notify
 ```
 
 ## API Endpoints
