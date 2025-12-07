@@ -103,17 +103,6 @@ services:
       - tunnelwatch
     restart: unless-stopped
 
-  signal-api:
-    image: bbernhard/signal-cli-rest-api:latest
-    container_name: tunnelwatch-signal
-    environment:
-      - MODE=native
-    volumes:
-      - signal_data:/home/.local/share/signal-cli
-    networks:
-      - tunnelwatch
-    restart: unless-stopped
-
 networks:
   tunnelwatch:
     driver: bridge
@@ -121,4 +110,3 @@ networks:
 volumes:
   postgres_data:
   redis_data:
-  signal_data:
